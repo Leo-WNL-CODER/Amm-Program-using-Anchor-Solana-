@@ -40,7 +40,11 @@ pub  fn swap_token(ctx:Context<SwapToken>, amount:u64)->Result<()>{
     }else{
         swap_token_b(&ctx, amount);
     }
-    
+    //have to add checks mentioned below
+    //Trading fees
+    // User-specified slippage limits
+    // Liquidity checks
+    // Safe integer arithmetic
 
 
     Ok(())
