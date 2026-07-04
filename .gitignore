@@ -6,5 +6,5 @@ node_modules
 test-ledger
 .yarn
 .surfpool
-.lock
-Anchor.toml
+Cargo.lock
+/target/
