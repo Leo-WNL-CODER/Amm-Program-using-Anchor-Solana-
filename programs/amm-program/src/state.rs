@@ -4,6 +4,8 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Amm {
+    pub swap_fee:u8,
+    pub swap_fee_decimal:u8,
     pub lp_token:Pubkey,
     pub token_a:Pubkey,
     pub token_b:Pubkey,

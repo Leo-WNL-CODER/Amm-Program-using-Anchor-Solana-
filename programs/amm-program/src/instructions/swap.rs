@@ -11,13 +11,13 @@ use crate::{AmmError, Amm};
 //          check if tokens are available  in the vaults or not must be greater than zero
 //          
 
-pub fn swap_token_a(ctx:& Context<SwapToken>,amount:u64){
+// pub fn swap_token_a(ctx:& Context<SwapToken>,amount:u64){
     
-}
+// }
 
-pub fn swap_token_b(ctx:& Context<SwapToken>,amount:u64){
+// pub fn swap_token_b(ctx:& Context<SwapToken>,amount:u64){
 
-}
+// }
 
 pub  fn swap_token(ctx:Context<SwapToken>, amount:u64)->Result<()>{
     
@@ -32,19 +32,21 @@ pub  fn swap_token(ctx:Context<SwapToken>, amount:u64)->Result<()>{
     require!(amount==0,AmmError::InvalidTokenSwapAmount);
 
 
-
     let amm=&ctx.accounts.amm_acc;
 
+    let amount_out:u64=amount-((amm.swap_fee/(amm.swap_fee_decimal*100)) as u64*amount);
+
     if user_token_address==token_a_add{
-        swap_token_a(&ctx , amount);
+        swap_token_a(&ctx , amount_out);
     }else{
-        swap_token_b(&ctx, amount);
+        swap_token_b(&ctx, amount_out);
     }
     //have to add checks mentioned below
-    //Trading fees
+    //Trading fees---done 
     // User-specified slippage limits
     // Liquidity checks
     // Safe integer arithmetic
+
 
 
     Ok(())
