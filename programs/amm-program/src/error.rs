@@ -11,6 +11,12 @@ pub enum AmmError {
     #[msg("User Token Address is invalid.Unable to Swap.")]
     InvalidTokenSwapAddress,
     #[msg("Invalid Swap Amount.")]
-    InvalidTokenSwapAmount
+    InvalidTokenSwapAmount,
+    #[msg("Error while calculating Transfer amount")]
+    SwapNotPossible,
+    #[msg("Not Enough Reserve")]
+    NoTokensAvailable,
+    #[msg("Token Addresses are identical")]
+    IdenticalTokenAddress,
 
 }
