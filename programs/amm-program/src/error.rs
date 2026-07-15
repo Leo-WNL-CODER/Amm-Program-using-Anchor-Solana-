@@ -18,5 +18,9 @@ pub enum AmmError {
     NoTokensAvailable,
     #[msg("Token Addresses are identical")]
     IdenticalTokenAddress,
+    #[msg("MathOverflow Occured")]
+    MathOverflow,
+    #[msg("Pool is empty.Hence Swap is not Possible")]
+    PoolEmpty,
 
 }

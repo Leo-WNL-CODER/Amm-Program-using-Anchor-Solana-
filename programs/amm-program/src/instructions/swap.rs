@@ -28,12 +28,16 @@ pub  fn swap_token(ctx:Context<SwapToken>, amount:u64)->Result<()>{
 
     let amm=&ctx.accounts.amm_acc;
 
-    let fee =
-    (amount as u128)
-    * (amm.swap_fee as u128)
-    / (amm.swap_fee_decimal as u128);
+    let fee ={
+        let a=(amount as u128).checked_mul(amm.swap_fee as u128)
+        .ok_or(AmmError::MathOverflow)?;
 
-    let new_user_amount:u64=amount-fee as u64;
+        a.checked_div(amm.swap_fee_decimal as u128)
+        .ok_or(AmmError::MathOverflow)?
+    };
+
+    let new_user_amount:u64=amount.checked_sub(fee as u64)
+    .ok_or(AmmError::MathOverflow)?;
 
     //have to add checks mentioned below
     //Trading fees---done 
@@ -80,18 +84,36 @@ pub  fn swap_token(ctx:Context<SwapToken>, amount:u64)->Result<()>{
         ctx.accounts.vault_a.amount
     };
 
-    let k=((prev_swap_amount as u128)*(cur_send_amount as u128));
+    require!(
+        prev_swap_amount > 0 && cur_send_amount > 0,
+        AmmError::PoolEmpty
+    );
 
-    let total_swap_amount=(prev_swap_amount+new_user_amount);
-    let new_send_amount=(k)/(total_swap_amount as u128);
+    let k=((prev_swap_amount as u128).checked_mul(cur_send_amount as u128)
+    .ok_or(AmmError::MathOverflow)?);
+
+    let total_swap_amount=(prev_swap_amount.checked_add(new_user_amount)
+    .ok_or(AmmError::MathOverflow)?);
+   
+   
+    let new_send_amount=(k).checked_div(total_swap_amount as u128)
+    .ok_or(AmmError::MathOverflow)?;
 
 
-    let amount_to_send_user=(cur_send_amount as u128)-new_send_amount;
+    let amount_to_send_user={
+        let a=(cur_send_amount as u128).checked_sub(new_send_amount)
+        .ok_or(AmmError::MathOverflow)?;
+        u64::try_from(a)
+        .map_err(|_| AmmError::MathOverflow)?
+    };
     
     // require!(new_send_amount>=0,AmmError::NoTokensAvailable);
 
-    require!((new_send_amount*total_swap_amount as u128)>=k,AmmError::NoTokensAvailable);
+    // require!((new_send_amount*total_swap_amount as u128)>=k,AmmError::NoTokensAvailable);
     require!(amount_to_send_user>0 , AmmError::SwapNotPossible);
+
+    require!(amount_to_send_user<=cur_send_amount , AmmError::NoTokensAvailable);
+
 
 
     let from=ctx.accounts.user_swap_ata.to_account_info();
